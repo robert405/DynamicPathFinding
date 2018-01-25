@@ -47,7 +47,7 @@ globalStartTime = time.time()
 nbUpdate = 15
 batchSize = 50
 counter = 1
-nbSimulation = 5000
+nbSimulation = 10000
 
 for k in range(nbSimulation):
 
@@ -87,6 +87,9 @@ for k in range(nbSimulation):
 
     mean = lossMean/nbUpdate
     print("Mean Loss : "+str(mean))
+
+    if (k == 8000):
+        lr = lr*0.1
 
     localEndTime = time.time()
     localElapsedTime = localEndTime - localStartTime
