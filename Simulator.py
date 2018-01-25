@@ -30,7 +30,7 @@ class Obstacle:
         yEnd = self.obstaclePos[1] + self.obstacleShape[1] + 5
         if (self.boardSize < yEnd):
             yEnd = self.obstaclePos[1] + self.obstacleShape[1]
-        board[xStart:xEnd, yStart:yEnd] = 0.1
+        board[xStart:xEnd, yStart:yEnd] = 0.02
 
     def putPenaltyOnBoard(self, board):
 

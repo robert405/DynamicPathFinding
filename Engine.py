@@ -125,14 +125,13 @@ class Engine:
 
         oldDist = self.getDist(oldRobotPos)
         newDist = self.getDist(newRobotPos)
+        penaltyList = self.calculateObstaclePenalty(newRobotPos)
 
         diff = oldDist - newDist
         diff = np.maximum(diff,np.zeros_like(diff))
-        norm = diff / 6
-        # sqrt(2) = 7.07106781187  diff max between old and new dist
+        norm = diff / 5
         norm = np.minimum(norm,np.ones_like(norm))
 
-        penaltyList = self.calculateObstaclePenalty(newRobotPos)
         reward = norm - penaltyList
         reward = np.maximum(reward,np.zeros_like(reward))
 
