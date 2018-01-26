@@ -2,6 +2,7 @@ from NetUtils import *
 import time
 from Engine import Engine
 from Utils import showImgs
+from math import isnan
 
 sess = tf.Session()
 
@@ -27,7 +28,8 @@ learning_rate = tf.placeholder(tf.float32, shape=[], name = "Learning_Rate")
 
 with tf.name_scope("TrainStep"):
 
-    loss = tf.reduce_mean(-tf.reduce_sum(y * tf.log(softmax), 1), name="Loss")
+    epsilonSoftmax = softmax + 2.220446049250313e-16
+    loss = tf.reduce_mean(-tf.reduce_sum(y * tf.log(epsilonSoftmax), 1), name="Loss")
     train_step = tf.train.AdamOptimizer(learning_rate,name="Training").minimize(loss)
 
 tf.summary.scalar('Compute-Loss',loss)
@@ -96,7 +98,7 @@ for k in range(nbSimulation):
     print("Local elapsed time (sec) : " + str(localElapsedTime))
     print("==================================================")
 
-    if (mean < 0.1):
+    if (mean < 0.01 or isnan(mean)):
         break
 
 
@@ -117,7 +119,7 @@ while(True):
     boards = engine.drawAllBoard()
     allBoard += [boards[0]]
 
-    for i in range(19):
+    for i in range(24):
 
         netBoards = engine.getAllBoardForNet()
         allMove = sess.run([move],feed_dict={x:netBoards})
@@ -126,7 +128,7 @@ while(True):
         boards = engine.drawAllBoard()
         allBoard += [boards[0]]
 
-    showImgs(allBoard, 4, 5)
+    showImgs(allBoard, 5, 5)
 
     print("exit or continu?")
     answer = input()

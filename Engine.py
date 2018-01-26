@@ -129,7 +129,7 @@ class Engine:
 
         diff = oldDist - newDist
         diff = np.maximum(diff,np.zeros_like(diff))
-        norm = diff / 5
+        norm = diff / 6
         norm = np.minimum(norm,np.ones_like(norm))
 
         reward = norm - penaltyList
@@ -161,14 +161,14 @@ class Engine:
 
         actionMoveDict = {
             0:np.array([0,0]),
-            1:np.array([5,0]),
-            2:np.array([0,5]),
-            3:np.array([-5,0]),
-            4:np.array([0,-5]),
-            5:np.array([5,5]),
-            6:np.array([-5,-5]),
-            7:np.array([5,-5]),
-            8:np.array([-5,5])
+            1:np.array([6,0]),
+            2:np.array([0,6]),
+            3:np.array([-6,0]),
+            4:np.array([0,-6]),
+            5:np.array([6,6]),
+            6:np.array([-6,-6]),
+            7:np.array([6,-6]),
+            8:np.array([-6,6])
         }
 
         return actionMoveDict
