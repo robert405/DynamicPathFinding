@@ -15,26 +15,26 @@ class Obstacle:
 
     def putSubPenaltyOnBoard(self, board):
 
-        xStart = self.obstaclePos[0] - 8
+        xStart = self.obstaclePos[0] - 5
         if (xStart < 0):
             xStart = self.obstaclePos[0]
 
-        yStart = self.obstaclePos[1] - 8
+        yStart = self.obstaclePos[1] - 5
         if (yStart < 0):
             yStart = self.obstaclePos[1]
 
-        xEnd = self.obstaclePos[0] + self.obstacleShape[0] + 8
+        xEnd = self.obstaclePos[0] + self.obstacleShape[0] + 5
         if (self.boardSize < xEnd):
             xEnd = self.obstaclePos[0] + self.obstacleShape[0]
 
-        yEnd = self.obstaclePos[1] + self.obstacleShape[1] + 8
+        yEnd = self.obstaclePos[1] + self.obstacleShape[1] + 5
         if (self.boardSize < yEnd):
             yEnd = self.obstaclePos[1] + self.obstacleShape[1]
-        board[xStart:xEnd, yStart:yEnd] = 0.02
+        board[xStart:xEnd, yStart:yEnd] = 0.01
 
     def putPenaltyOnBoard(self, board):
 
-        board[self.obstaclePos[0]:self.obstaclePos[0]+self.obstacleShape[0], self.obstaclePos[1]:self.obstaclePos[1]+self.obstacleShape[1]] = 1
+        board[self.obstaclePos[0]:self.obstaclePos[0]+self.obstacleShape[0], self.obstaclePos[1]:self.obstaclePos[1]+self.obstacleShape[1]] = 10
 
 class Simulation:
 

@@ -134,6 +134,7 @@ class Engine:
         norm = diff / 8
         # max vector length = 8.48528137424
         norm = np.minimum(norm,onesPlus)
+        norm = np.maximum(norm,np.zeros_like(norm))
 
         reward = norm - penaltyList
         reward = np.maximum(reward,onesMinus)

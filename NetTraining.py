@@ -48,8 +48,8 @@ globalStartTime = time.time()
 nbUpdate = 15
 batchSize = 50
 counter = 1
-nbSimulation = 250
-randMoveTreshold = 0.4
+nbSimulation = 7000
+randMoveTreshold = 0.5
 
 for k in range(nbSimulation):
 
