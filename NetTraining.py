@@ -21,15 +21,14 @@ inputSize = 1 * 1 * 512
 h_avPool_flat = tf.reshape(h_avPool, [-1, inputSize], name = "Flatening")
 
 pred = fullyLayerNoRelu("1", h_avPool_flat, 512, 9)
-softmax = tf.nn.softmax(pred,name="Softmax")
-move = tf.argmax(softmax,axis=1,name="Move")
+prediction = tf.identity(pred, name="Prediction")
+move = tf.argmax(pred,axis=1,name="Move")
 
 learning_rate = tf.placeholder(tf.float32, shape=[], name = "Learning_Rate")
 
 with tf.name_scope("TrainStep"):
 
-    epsilonSoftmax = softmax + 2.220446049250313e-16
-    loss = tf.reduce_mean(-tf.reduce_sum(y * tf.log(epsilonSoftmax), 1), name="Loss")
+    loss = tf.reduce_sum(tf.square(y - pred), name="Loss")
     train_step = tf.train.AdamOptimizer(learning_rate,name="Training").minimize(loss)
 
 tf.summary.scalar('Compute-Loss',loss)
@@ -49,7 +48,8 @@ globalStartTime = time.time()
 nbUpdate = 15
 batchSize = 50
 counter = 1
-nbSimulation = 10000
+nbSimulation = 250
+randMoveTreshold = 0.4
 
 for k in range(nbSimulation):
 
@@ -67,7 +67,13 @@ for k in range(nbSimulation):
         boards = engine.getAllBoardForNet()
         oldRobotPos = engine.getAllCurrentRobotPos()
 
-        allMove, allProb = sess.run([move, softmax],feed_dict={x:boards})
+        allMove, allProb = sess.run([move, prediction],feed_dict={x:boards})
+
+        if (randMoveTreshold < np.random.random()):
+            ones = np.ones_like(allMove)
+            randMove = ones * np.random.randint(0,high=9)
+            allMove = randMove
+
         newRobotPos = engine.getAllFuturRobotPos(allMove)
 
         reward = engine.calculateReward(oldRobotPos, newRobotPos)
@@ -85,7 +91,6 @@ for k in range(nbSimulation):
             lossMean += calculatedLoss
 
         engine.update(allMove)
-
 
     mean = lossMean/nbUpdate
     print("Mean Loss : "+str(mean))

@@ -126,14 +126,17 @@ class Engine:
         oldDist = self.getDist(oldRobotPos)
         newDist = self.getDist(newRobotPos)
         penaltyList = self.calculateObstaclePenalty(newRobotPos)
+        onesPlus = np.ones_like(oldDist)
+        onesMinus = onesPlus * -1
+
 
         diff = oldDist - newDist
-        diff = np.maximum(diff,np.zeros_like(diff))
-        norm = diff / 6
-        norm = np.minimum(norm,np.ones_like(norm))
+        norm = diff / 8
+        # max vector length = 8.48528137424
+        norm = np.minimum(norm,onesPlus)
 
         reward = norm - penaltyList
-        reward = np.maximum(reward,np.zeros_like(reward))
+        reward = np.maximum(reward,onesMinus)
 
         return reward
 
