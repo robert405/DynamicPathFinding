@@ -128,16 +128,17 @@ class Engine:
         penaltyList = self.calculateObstaclePenalty(newRobotPos)
         onesPlus = np.ones_like(oldDist)
         onesMinus = onesPlus * -1
+        twoMinus = onesPlus * -2
 
 
         diff = oldDist - newDist
         norm = diff / 8
         # max vector length = 8.48528137424
         norm = np.minimum(norm,onesPlus)
-        norm = np.maximum(norm,np.zeros_like(norm))
+        norm = np.maximum(norm,onesMinus)
 
         reward = norm - penaltyList
-        reward = np.maximum(reward,onesMinus)
+        reward = np.maximum(reward,twoMinus)
 
         return reward
 
@@ -164,15 +165,14 @@ class Engine:
     def createActionMoveAssociation(self):
 
         actionMoveDict = {
-            0:np.array([0,0]),
-            1:np.array([6,0]),
-            2:np.array([0,6]),
-            3:np.array([-6,0]),
-            4:np.array([0,-6]),
-            5:np.array([6,6]),
-            6:np.array([-6,-6]),
-            7:np.array([6,-6]),
-            8:np.array([-6,6])
+            0:np.array([6,0]),
+            1:np.array([0,6]),
+            2:np.array([-6,0]),
+            3:np.array([0,-6]),
+            4:np.array([6,6]),
+            5:np.array([-6,-6]),
+            6:np.array([6,-6]),
+            7:np.array([-6,6])
         }
 
         return actionMoveDict

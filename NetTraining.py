@@ -20,7 +20,7 @@ h_avPool = tf.layers.average_pooling2d(description, [7, 7], [7, 7], name="Avg_Po
 inputSize = 1 * 1 * 512
 h_avPool_flat = tf.reshape(h_avPool, [-1, inputSize], name = "Flatening")
 
-pred = fullyLayerNoRelu("1", h_avPool_flat, 512, 9)
+pred = fullyLayerNoRelu("1", h_avPool_flat, 512, 8)
 prediction = tf.identity(pred, name="Prediction")
 move = tf.argmax(pred,axis=1,name="Move")
 
@@ -48,7 +48,7 @@ globalStartTime = time.time()
 nbUpdate = 15
 batchSize = 50
 counter = 1
-nbSimulation = 7000
+nbSimulation = 10
 randMoveTreshold = 0.5
 
 for k in range(nbSimulation):
@@ -71,7 +71,7 @@ for k in range(nbSimulation):
 
         if (randMoveTreshold < np.random.random()):
             ones = np.ones_like(allMove)
-            randMove = ones * np.random.randint(0,high=9)
+            randMove = ones * np.random.randint(0,high=8)
             allMove = randMove
 
         newRobotPos = engine.getAllFuturRobotPos(allMove)
