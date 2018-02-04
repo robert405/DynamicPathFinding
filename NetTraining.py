@@ -6,7 +6,7 @@ from math import isnan
 
 sess = tf.Session()
 
-y = tf.placeholder(tf.float32, shape=[None, 9], name = "y")
+y = tf.placeholder(tf.float32, shape=[None, 8], name = "y")
 x = tf.placeholder(tf.float32, shape=[None, 224,224,1], name = "x")
 x_norm = tf.divide(tf.subtract(x, tf.to_float(128)), tf.to_float(128), name="imgNorm")
 
