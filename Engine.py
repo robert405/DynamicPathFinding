@@ -3,10 +3,9 @@ import numpy as np
 
 class Engine:
 
-    def __init__(self, nbSimulation, robotShape, goalShape, boardSize, nbChannel):
+    def __init__(self, nbSimulation, robotShape, goalShape, boardSize):
 
         self.boardSize = boardSize
-        self.nbChannel = nbChannel
         self.robotShape = robotShape
         self.goalShape = goalShape
         self.robotShape = robotShape
@@ -44,7 +43,7 @@ class Engine:
             self.allGoalPos[i,0] = xGoalPos
             self.allGoalPos[i,1] = yGoalPos
 
-            self.simulationList += [Simulation((xRobotPos,yRobotPos), self.robotShape, (xGoalPos,yGoalPos), self.goalShape, self.boardSize, self.nbChannel)]
+            self.simulationList += [Simulation((xRobotPos,yRobotPos), self.robotShape, (xGoalPos,yGoalPos), self.goalShape, self.boardSize)]
 
     def update(self, robotMoveList):
 
@@ -54,21 +53,9 @@ class Engine:
             self.allRobotPos[i] = self.allRobotPos[i] + currentMove
             self.simulationList[i].update(currentMove)
 
-    def getAllCurrentRobotPos(self):
+    def getAllRobotPos(self):
 
         return np.copy(self.allRobotPos)
-
-    def getAllFuturRobotPos(self, robotMoveList):
-
-        futurPos = np.zeros_like(self.allRobotPos)
-
-        for i in range(self.nbSimulation):
-
-            currentMove = self.actionMove[robotMoveList[i]]
-            currentMove = self.checkInLimit(self.allRobotPos[i], currentMove)
-            futurPos[i] = self.allRobotPos[i] + currentMove
-
-        return futurPos
 
     def checkInLimit(self, pos, move):
 
@@ -85,8 +72,6 @@ class Engine:
             move[1] = 0
 
         return move
-
-
 
     def getAllGoalPos(self):
 
@@ -126,19 +111,10 @@ class Engine:
         oldDist = self.getDist(oldRobotPos)
         newDist = self.getDist(newRobotPos)
         penaltyList = self.calculateObstaclePenalty(newRobotPos)
-        onesPlus = np.ones_like(oldDist)
-        onesMinus = onesPlus * -1
-        twoMinus = onesPlus * -2
-
 
         diff = oldDist - newDist
-        norm = diff / 8
-        # max vector length = 8.48528137424
-        norm = np.minimum(norm,onesPlus)
-        norm = np.maximum(norm,onesMinus)
-
+        norm = diff / 14
         reward = norm - penaltyList
-        reward = np.maximum(reward,twoMinus)
 
         return reward
 
@@ -164,15 +140,18 @@ class Engine:
 
     def createActionMoveAssociation(self):
 
+        moveDist = 10
+        moveDistMinus = moveDist * -1
+
         actionMoveDict = {
-            0:np.array([6,0]),
-            1:np.array([0,6]),
-            2:np.array([-6,0]),
-            3:np.array([0,-6]),
-            4:np.array([6,6]),
-            5:np.array([-6,-6]),
-            6:np.array([6,-6]),
-            7:np.array([-6,6])
+            0:np.array([moveDist,0]),
+            1:np.array([0,moveDist]),
+            2:np.array([moveDistMinus,0]),
+            3:np.array([0,moveDistMinus]),
+            4:np.array([moveDist,moveDist]),
+            5:np.array([moveDistMinus,moveDistMinus]),
+            6:np.array([moveDist,moveDistMinus]),
+            7:np.array([moveDistMinus,moveDist])
         }
 
         return actionMoveDict

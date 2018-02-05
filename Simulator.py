@@ -34,18 +34,17 @@ class Obstacle:
 
     def putPenaltyOnBoard(self, board):
 
-        board[self.obstaclePos[0]:self.obstaclePos[0]+self.obstacleShape[0], self.obstaclePos[1]:self.obstaclePos[1]+self.obstacleShape[1]] = 10
+        board[self.obstaclePos[0]:self.obstaclePos[0]+self.obstacleShape[0], self.obstaclePos[1]:self.obstaclePos[1]+self.obstacleShape[1]] = 100
 
 class Simulation:
 
-    def __init__(self, robotPos, robotShape, goalPos, goalShape, boardSize, nbChannel):
+    def __init__(self, robotPos, robotShape, goalPos, goalShape, boardSize):
 
         self.robotColor = 170
         self.goalColor = 255
         self.obstacleColor = 85
 
         self.boardSize = boardSize
-        self.nbChannel = nbChannel
         self.robotPos = robotPos
         self.robotShape = robotShape
         self.goalPos = goalPos

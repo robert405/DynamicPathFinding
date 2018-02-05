@@ -45,10 +45,10 @@ lr = 1e-4
 
 globalStartTime = time.time()
 
-nbUpdate = 15
+nbUpdate = 1
 batchSize = 50
 counter = 1
-nbSimulation = 10
+nbSimulation = 5
 randMoveTreshold = 0.5
 
 for k in range(nbSimulation):
@@ -58,39 +58,54 @@ for k in range(nbSimulation):
     print("Learning rate : " + str(lr))
 
     localStartTime = time.time()
-    engine = Engine(batchSize,(15,15),(15,15),224,1)
+    engine = Engine(batchSize,(15,15),(15,15),224)
+    startBoard = engine.getAllBoardForNet()
+    predProb = sess.run([prediction],feed_dict={x:startBoard})
+    moveProb = predProb[0]
+    firstMove = np.zeros((batchSize),dtype=int)
+    reward = np.zeros((batchSize))
 
     lossMean = 0
 
     for i in range(nbUpdate):
 
         boards = engine.getAllBoardForNet()
-        oldRobotPos = engine.getAllCurrentRobotPos()
-
-        allMove, allProb = sess.run([move, prediction],feed_dict={x:boards})
+        oldRobotPos = engine.getAllRobotPos()
+        allMove = np.zeros((batchSize),dtype=int)
 
         if (randMoveTreshold < np.random.random()):
             ones = np.ones_like(allMove)
             randMove = ones * np.random.randint(0,high=8)
             allMove = randMove
-
-        newRobotPos = engine.getAllFuturRobotPos(allMove)
-
-        reward = engine.calculateReward(oldRobotPos, newRobotPos)
-        targetLabel = allProb
-        rowIndexing = np.arange(batchSize)
-        targetLabel[rowIndexing,allMove] = reward
+        else:
+            predMoves = sess.run([move],feed_dict={x:boards})
+            allMove = predMoves[0]
 
         if (i == 0):
-            summary,_,calculatedLoss = sess.run([merged,train_step,loss],feed_dict={x:boards, y:targetLabel, learning_rate:lr})
-            lossMean += calculatedLoss
-            counter += 1
-            writer.add_summary(summary,counter)
-        else:
-            _,calculatedLoss = sess.run([train_step,loss],feed_dict={x:boards,y:targetLabel,learning_rate:lr})
-            lossMean += calculatedLoss
+            firstMove = allMove
 
         engine.update(allMove)
+        newRobotPos = engine.getAllRobotPos()
+        reward = reward + engine.calculateReward(oldRobotPos, newRobotPos)
+
+    # normalizing reward between -2 and 1
+    reward = reward / nbUpdate
+    onesPlus = np.ones_like(reward)
+    twoMinus = onesPlus * -2
+    reward = np.minimum(reward,onesPlus)
+    reward = np.maximum(reward,twoMinus)
+
+    rowIndexing = np.arange(batchSize)
+    moveProb[rowIndexing,firstMove] = reward
+
+    if (k % 20 == 0):
+        summary,_,calculatedLoss = sess.run([merged,train_step,loss],feed_dict={x:startBoard, y:moveProb, learning_rate:lr})
+        lossMean += calculatedLoss
+        counter += 1
+        writer.add_summary(summary,counter)
+    else:
+        _,calculatedLoss = sess.run([train_step,loss],feed_dict={x:startBoard,y:moveProb,learning_rate:lr})
+        lossMean += calculatedLoss
 
     mean = lossMean/nbUpdate
     print("Mean Loss : "+str(mean))
@@ -120,7 +135,7 @@ saver.save(sess, "./model/model.ckpt")
 while(True):
 
     allBoard = []
-    engine = Engine(1,(15,15),(15,15),224,1)
+    engine = Engine(1,(15,15),(15,15),224)
     boards = engine.drawAllBoard()
     allBoard += [boards[0]]
 
