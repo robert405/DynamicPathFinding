@@ -48,8 +48,11 @@ globalStartTime = time.time()
 nbUpdate = 1
 batchSize = 50
 counter = 1
-nbSimulation = 5
-randMoveTreshold = 0.5
+nbSimulation = 8000
+randMoveTreshold = 0.4
+
+onesPlus = np.ones((batchSize))
+twoMinus = onesPlus * -2
 
 for k in range(nbSimulation):
 
@@ -90,8 +93,6 @@ for k in range(nbSimulation):
 
     # normalizing reward between -2 and 1
     reward = reward / nbUpdate
-    onesPlus = np.ones_like(reward)
-    twoMinus = onesPlus * -2
     reward = np.minimum(reward,onesPlus)
     reward = np.maximum(reward,twoMinus)
 
@@ -110,8 +111,12 @@ for k in range(nbSimulation):
     mean = lossMean/nbUpdate
     print("Mean Loss : "+str(mean))
 
-    if (k == 8000):
+    if (k == 10000):
         lr = lr*0.1
+
+    if (k == 1000):
+        nbUpdate = 5
+        randMoveTreshold = 0.9
 
     localEndTime = time.time()
     localElapsedTime = localEndTime - localStartTime
