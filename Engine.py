@@ -106,7 +106,7 @@ class Engine:
 
         return boardList
 
-    def calculateReward(self, oldRobotPos, newRobotPos):
+    def calculateStepReward(self, oldRobotPos, newRobotPos):
 
         oldDist = self.getDist(oldRobotPos)
         newDist = self.getDist(newRobotPos)
@@ -115,6 +115,16 @@ class Engine:
         diff = oldDist - newDist
         norm = diff / 14
         reward = norm - penaltyList
+        clipReward = np.maximum(reward,-10)
+
+        return clipReward
+
+    def calculateFinalReward(self, robotPos):
+
+        reward = self.getDist(robotPos)
+        reward[reward <= 25] = 5
+        reward[reward > 100] = -5
+        reward[reward > 25] = 0
 
         return reward
 

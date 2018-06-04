@@ -1,8 +1,19 @@
 from NetUtils import *
 import time
 from Engine import Engine
-from Utils import showImgs
 from math import isnan
+import matplotlib.pyplot as plt
+
+def showImgs(imgs, nbEx, nbCl):
+    counter = 0
+    for i in range(nbCl):
+        for j in range(nbEx):
+            plt.subplot(nbEx, nbCl, counter+1)
+            plt.imshow(imgs[counter].astype('uint8'))
+            plt.axis('off')
+            counter += 1
+
+    plt.show()
 
 sess = tf.Session()
 
@@ -89,7 +100,7 @@ for k in range(nbSimulation):
 
         engine.update(allMove)
         newRobotPos = engine.getAllRobotPos()
-        reward = reward + engine.calculateReward(oldRobotPos, newRobotPos)
+        reward = reward + engine.calculateStepReward(oldRobotPos, newRobotPos)
 
     # normalizing reward between -2 and 1
     reward = reward / nbUpdate
