@@ -16,17 +16,18 @@ def showImgs(imgs, nbEx, nbCl):
 
     plt.show()
 
-saveIt = 2
+saveIt = -1
 savePath = "../SavedModel/pathFinderModel"
 
 model = PathFinder().cuda()
-model.load_state_dict(torch.load(savePath + str(saveIt)))
+if (saveIt >= 0):
+    model.load_state_dict(torch.load(savePath + str(saveIt)))
 
-nbIteration = 5000
+nbIteration = 8000
 nbUpdate = 25
 batchSize = 60
 lr = 1e-4
-startRandTresh = 0.5
+startRandTresh = 0
 randTreshRate = 400
 
 lossList = train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTreshRate)

@@ -8,7 +8,7 @@ def train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTresh
 
     print("Starting trainning!")
     criterion = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=0.0005)
 
     randMoveTreshold = startRandTresh
     lossList = []
