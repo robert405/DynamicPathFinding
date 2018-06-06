@@ -40,9 +40,9 @@ class Simulation:
 
     def __init__(self, robotPos, robotShape, goalPos, goalShape, boardSize):
 
-        self.robotColor = 170
-        self.goalColor = 255
-        self.obstacleColor = 85
+        self.robotColor = 1
+        self.goalColor = 2
+        self.obstacleColor = -1
 
         self.boardSize = boardSize
         self.robotPos = robotPos

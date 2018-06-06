@@ -13,10 +13,10 @@ class ResidualModule(nn.Module):
     def forward(self, data):
 
         residual = torch.cat((data, data), 1)
-        h = F.relu(self.conv1(data))
+        h = F.leaky_relu(self.conv1(data), 1e-2)
         h = self.conv2(h)
         h = residual + h
-        o = F.relu(h)
+        o = F.leaky_relu(h, 1e-2)
 
         return o
 
@@ -41,7 +41,7 @@ class PathFinder(nn.Module):
 
     def forward(self, boards):
 
-        h = F.relu(self.conv1(boards))
+        h = F.leaky_relu(self.conv1(boards), 1e-2)
         h = self.max1(h)
         h = self.res1(h)
         h = self.max2(h)
@@ -50,8 +50,8 @@ class PathFinder(nn.Module):
         h = self.res3(h)
         h = self.max4(h)
         h = h.view(-1, self.flatShape)
-        h = F.relu(self.lin1(h))
-        h = F.relu(self.lin2(h))
+        h = F.leaky_relu(self.lin1(h), 1e-2)
+        h = F.leaky_relu(self.lin2(h), 1e-2)
         o = self.lin3(h)
 
         return o

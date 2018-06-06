@@ -53,11 +53,12 @@ def train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTresh
             torchBoards = torch.FloatTensor(boards).cuda()
             torchBoards = torchBoards.transpose(1, 3)
             allPred = model(torchBoards)
-            currentReward = reward + (0.9 * currentReward)
-            currentReward = np.maximum(currentReward, -1)
+            reward = reward + currentReward
+            reward = np.maximum(reward, -1)
+            currentReward = 0.9 * currentReward
             rowIndexing = np.arange(batchSize)
             target = allPred.data.cpu().numpy()
-            target[rowIndexing, allMove] = currentReward
+            target[rowIndexing, allMove] = reward
             torchTarget = torch.FloatTensor(target).cuda()
 
             loss = criterion(allPred, torchTarget)
