@@ -25,7 +25,7 @@ def train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTresh
 
         for i in range(nbUpdate):
 
-            boards = engine.getAllBoardForNet()
+            boards = engine.drawAllBoard()
             oldRobotPos = engine.getAllRobotPos()
             allMove = np.random.rand(batchSize) * 8
             allMove = np.floor(allMove).astype('int')
@@ -51,7 +51,7 @@ def train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTresh
 
             boards, allMove, reward = trainSeq[i]
             torchBoards = torch.FloatTensor(boards).cuda()
-            torchBoards = torchBoards.transpose(1, 3)
+            torchBoards = torch.unsqueeze(torchBoards, 1)
             allPred = model(torchBoards)
             reward = reward + currentReward
             reward = np.maximum(reward, -1)

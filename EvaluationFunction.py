@@ -28,15 +28,14 @@ def evaluateModel(model):
             allBoard += [board]
 
             for i in range(24):
-                netBoards = engine.getAllBoardForNet()
-                torchBoards = torch.FloatTensor(netBoards).cuda()
-                torchBoards = torchBoards.transpose(1, 3)
+                boards = engine.drawAllBoard()
+                torchBoards = torch.FloatTensor(boards).cuda()
+                torchBoards = torch.unsqueeze(torchBoards, 1)
                 predMove = model(torchBoards)
                 allMove = predMove.data.cpu().numpy()
                 allMove = np.argmax(allMove, axis=1)
                 engine.update(allMove)
 
-                boards = engine.drawAllBoard()
                 board = boards[0] + 2.0
                 board = board * (252 / 4)
                 allBoard += [board]

@@ -4,25 +4,14 @@ from TrainingFunction import train
 from EvaluationFunction import evaluateModel
 import matplotlib.pyplot as plt
 
-def showImgs(imgs, nbEx, nbCl):
-    counter = 0
-    for i in range(nbCl):
-        for j in range(nbEx):
-            plt.subplot(nbEx, nbCl, counter+1)
-            plt.imshow(imgs[counter].astype('uint8'))
-            plt.axis('off')
-            counter += 1
-
-    plt.show()
-
-saveIt = 0
+saveIt = -1
 savePath = "../SavedModel/pathFinderModel"
 
 model = PathFinder().cuda()
 if (saveIt >= 0):
     model.load_state_dict(torch.load(savePath + str(saveIt)))
 
-nbIteration = 500
+nbIteration = 5
 nbUpdate = 20
 batchSize = 60
 lr = 1e-4

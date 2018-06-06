@@ -79,20 +79,10 @@ class Engine:
 
     def drawAllBoard(self):
 
-        boardList = []
-
-        for simulation in self.simulationList:
-
-            boardList += [simulation.drawBoard()]
-
-        return boardList
-
-    def getAllBoardForNet(self):
-
-        boardList = np.zeros((self.nbSimulation,self.boardSize,self.boardSize,1))
+        boardList = np.zeros((self.nbSimulation,self.boardSize,self.boardSize))
 
         for i in range(self.nbSimulation):
-            boardList[i] = self.simulationList[i].getBoardForNet()
+            boardList[i] = self.simulationList[i].drawBoard()
 
         return boardList
 
