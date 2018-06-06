@@ -11,7 +11,7 @@ model = PathFinder().cuda()
 if (saveIt >= 0):
     model.load_state_dict(torch.load(savePath + str(saveIt)))
 
-nbIteration = 5
+nbIteration = 500
 nbUpdate = 20
 batchSize = 60
 lr = 1e-4

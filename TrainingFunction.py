@@ -33,7 +33,7 @@ def train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTresh
             if (randMoveTreshold < np.random.random()):
                 with torch.no_grad():
                     torchBoards = torch.FloatTensor(boards).cuda()
-                    torchBoards = torchBoards.transpose(1, 3)
+                    torchBoards = torch.unsqueeze(torchBoards, 1)
                     allPred = model(torchBoards)
                     target = allPred.data.cpu().numpy()
                     allMove = np.argmax(target, axis=1)
