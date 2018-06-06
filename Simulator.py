@@ -34,7 +34,7 @@ class Obstacle:
 
     def putPenaltyOnBoard(self, board):
 
-        board[self.obstaclePos[0]:self.obstaclePos[0]+self.obstacleShape[0], self.obstaclePos[1]:self.obstaclePos[1]+self.obstacleShape[1]] = 100
+        board[self.obstaclePos[0]:self.obstaclePos[0]+self.obstacleShape[0], self.obstaclePos[1]:self.obstaclePos[1]+self.obstacleShape[1]] = 1
 
 class Simulation:
 
@@ -109,9 +109,9 @@ class Simulation:
 
     def addObstaclesPenalty(self,board):
 
-        for obstacle in self.obstacleList:
+        #for obstacle in self.obstacleList:
 
-            obstacle.putSubPenaltyOnBoard(board)
+         #   obstacle.putSubPenaltyOnBoard(board)
 
         for obstacle in self.obstacleList:
 

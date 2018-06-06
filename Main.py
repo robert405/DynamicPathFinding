@@ -16,22 +16,22 @@ def showImgs(imgs, nbEx, nbCl):
 
     plt.show()
 
-
-savePath = '../SavedModel/pathFinderModel.pt'
+saveIt = 2
+savePath = "../SavedModel/pathFinderModel"
 
 model = PathFinder().cuda()
-model.load_state_dict(torch.load(savePath))
+model.load_state_dict(torch.load(savePath + str(saveIt)))
 
-nbIteration = 1000
+nbIteration = 5000
 nbUpdate = 25
 batchSize = 60
-lr = 1e-3
-startRandTresh = 0.2
-randTreshRate = 100
+lr = 1e-4
+startRandTresh = 0.5
+randTreshRate = 400
 
 lossList = train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTreshRate)
 
-torch.save(model.state_dict(), savePath)
+torch.save(model.state_dict(), savePath + str(saveIt + 1))
 
 plt.plot(lossList)
 plt.show()

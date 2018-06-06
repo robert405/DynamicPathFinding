@@ -27,11 +27,10 @@ def train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTresh
 
             boards = engine.getAllBoardForNet()
             oldRobotPos = engine.getAllRobotPos()
-            allMove = np.ones((batchSize), dtype=int)
+            allMove = np.random.rand(batchSize) * 8
+            allMove = np.floor(allMove).astype('int')
 
             if (randMoveTreshold < np.random.random()):
-                allMove = allMove * np.random.randint(0, high=8)
-            else:
                 with torch.no_grad():
                     torchBoards = torch.FloatTensor(boards).cuda()
                     torchBoards = torchBoards.transpose(1, 3)
@@ -55,6 +54,7 @@ def train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTresh
             torchBoards = torchBoards.transpose(1, 3)
             allPred = model(torchBoards)
             currentReward = reward + (0.9 * currentReward)
+            currentReward = np.maximum(currentReward, -1)
             rowIndexing = np.arange(batchSize)
             target = allPred.data.cpu().numpy()
             target[rowIndexing, allMove] = currentReward
@@ -72,10 +72,10 @@ def train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTresh
         if (k % moduloPrint == 0):
             print("Iteration : " + str(k+1) + " / " + str(nbIteration) + ", Current mean loss : " + str(meanLoss/(moduloPrint*nbUpdate)))
 
-        if ((k+1) % randTreshRate == 0 and randMoveTreshold < 1):
-            randMoveTreshold += 0.05
+        if ((k+1) % randTreshRate == 0 and randMoveTreshold > 0):
+            randMoveTreshold += -0.05
 
-        if (k % 300 == 0):
+        if (k % 200 == 0):
             end = time.time()
             timeTillNow = end - start
             predictedRemainingTime = (timeTillNow / (k + 1)) * (nbIteration - (k + 1))

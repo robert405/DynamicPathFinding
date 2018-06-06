@@ -111,20 +111,22 @@ class Engine:
         oldDist = self.getDist(oldRobotPos)
         newDist = self.getDist(newRobotPos)
         penaltyList = self.calculateObstaclePenalty(newRobotPos)
+        penaltyList = np.minimum(penaltyList, 1)
 
         diff = oldDist - newDist
         norm = diff / 14
-        reward = norm - penaltyList
-        clipReward = np.maximum(reward,-10)
+        reward = np.maximum(norm, 0)
+        reward = reward - penaltyList
 
-        return clipReward
+
+        return reward
 
     def calculateFinalReward(self, robotPos):
 
         reward = self.getDist(robotPos)
-        reward[reward <= 25] = 5
-        reward[reward > 100] = -5
-        reward[reward > 25] = 0
+        reward[reward <= 25] = 4
+        reward[(reward <= 75) & (reward > 25)] = 2
+        reward[reward > 75] = 0
 
         return reward
 
