@@ -16,14 +16,14 @@ def showImgs(imgs, nbEx, nbCl):
 
     plt.show()
 
-saveIt = -1
+saveIt = 0
 savePath = "../SavedModel/pathFinderModel"
 
 model = PathFinder().cuda()
 if (saveIt >= 0):
     model.load_state_dict(torch.load(savePath + str(saveIt)))
 
-nbIteration = 8000
+nbIteration = 5
 nbUpdate = 25
 batchSize = 60
 lr = 1e-4

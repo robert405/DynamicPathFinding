@@ -118,15 +118,14 @@ class Engine:
         reward = np.maximum(norm, 0)
         reward = reward - penaltyList
 
-
         return reward
 
     def calculateFinalReward(self, robotPos):
 
         reward = self.getDist(robotPos)
-        reward[reward <= 25] = 4
-        reward[(reward <= 75) & (reward > 25)] = 2
-        reward[reward > 75] = 0
+        reward[reward <= 25] = 1
+        #reward[(reward <= 75) & (reward > 25)] = 2
+        reward[reward > 25] = 0
 
         return reward
 
