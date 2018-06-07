@@ -11,12 +11,12 @@ model = PathFinder().cuda()
 if (saveIt >= 0):
     model.load_state_dict(torch.load(savePath + str(saveIt)))
 
-nbIteration = 500
-nbUpdate = 20
-batchSize = 60
+nbIteration = 10000
+nbUpdate = 1
+batchSize = 50
 lr = 1e-4
-startRandTresh = 1 # must start at 1 to have complete random choice in beginning
-randTreshRate = 75
+startRandTresh = 1 # start at 1 to have complete random choice in beginning
+randTreshRate = 100000
 
 lossList = train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTreshRate)
 

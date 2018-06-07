@@ -8,7 +8,7 @@ def train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTresh
 
     print("Starting trainning!")
     criterion = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=0.0005)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
     randMoveTreshold = startRandTresh
     lossList = []
@@ -68,10 +68,12 @@ def train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTresh
 
             currentLoss = loss.data.cpu().numpy()
             meanLoss += currentLoss
-            lossList += [currentLoss]
+
+        meanLoss = meanLoss / nbUpdate
+        lossList += [meanLoss]
 
         if (k % moduloPrint == 0):
-            print("Iteration : " + str(k+1) + " / " + str(nbIteration) + ", Current mean loss : " + str(meanLoss/(moduloPrint*nbUpdate)))
+            print("Iteration : " + str(k+1) + " / " + str(nbIteration) + ", Current mean loss : " + str(meanLoss))
 
         if ((k+1) % randTreshRate == 0 and randMoveTreshold > 0):
             randMoveTreshold += -0.05
