@@ -1,4 +1,4 @@
-from Simulator import Simulation
+from SimWorld.Simulator import Simulation
 import numpy as np
 
 class Engine:
@@ -86,16 +86,6 @@ class Engine:
 
         return boardList
 
-    def createAllPenaltyBoard(self):
-
-        boardList = []
-
-        for simulation in self.simulationList:
-
-            boardList += [simulation.createPenaltyBoard()]
-
-        return boardList
-
     def calculateStepReward(self, oldRobotPos, newRobotPos):
 
         oldDist = self.getDist(oldRobotPos)
@@ -114,7 +104,6 @@ class Engine:
 
         reward = self.getDist(robotPos)
         reward[reward <= 25] = 1
-        #reward[(reward <= 75) & (reward > 25)] = 2
         reward[reward > 25] = 0
 
         return reward
@@ -133,7 +122,7 @@ class Engine:
 
         for i in range(self.nbSimulation):
 
-            penaltyBoard = self.simulationList[i].createPenaltyBoard()
+            penaltyBoard = self.simulationList[i].penaltyBoard
             allPenalty = penaltyBoard[newRobotPos[i,0]:newRobotPos[i,0] + self.robotShape[0], newRobotPos[i,1]:newRobotPos[i,1] + self.robotShape[1]]
             penaltyList[i] = np.sum(allPenalty)
 

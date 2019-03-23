@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from Engine import Engine
+from SimWorld.Engine import Engine
 import matplotlib.pyplot as plt
 
 def showImgs(imgs, nbEx, nbCl):
@@ -14,6 +14,10 @@ def showImgs(imgs, nbEx, nbCl):
 
     plt.show()
 
+def adjustBoardFromSim(board):
+
+    return (board + 1.0) * 127.5
+
 def evaluateModel(model):
 
     model.eval()
@@ -23,9 +27,7 @@ def evaluateModel(model):
             allBoard = []
             engine = Engine(1, (15, 15), (15, 15), 224)
             boards = engine.drawAllBoard()
-            board = boards[0] + 2.0
-            board = board * (252 / 4)
-            allBoard += [board]
+            allBoard += [adjustBoardFromSim(boards[0])]
 
             for i in range(24):
                 boards = engine.drawAllBoard()
@@ -36,9 +38,7 @@ def evaluateModel(model):
                 allMove = np.argmax(allMove, axis=1)
                 engine.update(allMove)
 
-                board = boards[0] + 2.0
-                board = board * (252 / 4)
-                allBoard += [board]
+                allBoard += [adjustBoardFromSim(boards[0])]
 
             showImgs(allBoard, 5, 5)
 

@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class ResidualModuleDouble(nn.Module):
+
     def __init__(self, inputSize, outputSize):
 
         super(ResidualModuleDouble, self).__init__()
@@ -13,14 +14,15 @@ class ResidualModuleDouble(nn.Module):
     def forward(self, inputData):
 
         residual = torch.cat((inputData, inputData), 1)
-        h = F.leaky_relu(self.conv1(inputData), 1e-2)
+        h = F.elu(self.conv1(inputData))
         h = self.conv2(h)
         h = residual + h
-        o = F.leaky_relu(h, 1e-2)
+        o = F.elu(h)
 
         return o
 
 class ResidualModuleSingle(nn.Module):
+
     def __init__(self, inputSize):
 
         super(ResidualModuleSingle, self).__init__()
@@ -30,14 +32,15 @@ class ResidualModuleSingle(nn.Module):
 
     def forward(self, inputData):
 
-        h = F.leaky_relu(self.conv1(inputData), 1e-2)
+        h = F.elu(self.conv1(inputData))
         h = self.conv2(h)
         h = inputData + h
-        o = F.leaky_relu(h, 1e-2)
+        o = F.elu(h)
 
         return o
 
 class PathFinder(nn.Module):
+
     def __init__(self):
 
         super(PathFinder, self).__init__()
@@ -58,7 +61,7 @@ class PathFinder(nn.Module):
 
     def forward(self, boards):
 
-        h = F.leaky_relu(self.conv1(boards), 1e-2)
+        h = F.elu(self.conv1(boards))
         h = self.max1(h)
         h = self.res1(h)
         h = self.max2(h)
@@ -69,7 +72,8 @@ class PathFinder(nn.Module):
         h = self.res4(h)
         h = self.avg1(h)
         h = h.view(-1, self.flatShape)
-        o = self.lin1(h)
+        h = self.lin1(h)
+        o = torch.tanh(h)
 
         return o
 

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 import time
-from Engine import Engine
+from SimWorld.Engine import Engine
 
 def train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTreshRate):
 

@@ -13,25 +13,6 @@ class Obstacle:
 
         board[self.obstaclePos[0]:self.obstaclePos[0]+self.obstacleShape[0], self.obstaclePos[1]:self.obstaclePos[1]+self.obstacleShape[1]] = self.obstacleColor
 
-    def putSubPenaltyOnBoard(self, board):
-
-        xStart = self.obstaclePos[0] - 5
-        if (xStart < 0):
-            xStart = self.obstaclePos[0]
-
-        yStart = self.obstaclePos[1] - 5
-        if (yStart < 0):
-            yStart = self.obstaclePos[1]
-
-        xEnd = self.obstaclePos[0] + self.obstacleShape[0] + 5
-        if (self.boardSize < xEnd):
-            xEnd = self.obstaclePos[0] + self.obstacleShape[0]
-
-        yEnd = self.obstaclePos[1] + self.obstacleShape[1] + 5
-        if (self.boardSize < yEnd):
-            yEnd = self.obstaclePos[1] + self.obstacleShape[1]
-        board[xStart:xEnd, yStart:yEnd] = 0.01
-
     def putPenaltyOnBoard(self, board):
 
         board[self.obstaclePos[0]:self.obstaclePos[0]+self.obstacleShape[0], self.obstaclePos[1]:self.obstaclePos[1]+self.obstacleShape[1]] = 1
@@ -40,8 +21,8 @@ class Simulation:
 
     def __init__(self, robotPos, robotShape, goalPos, goalShape, boardSize):
 
-        self.robotColor = 1
-        self.goalColor = 2
+        self.robotColor = 0.5
+        self.goalColor = 1
         self.obstacleColor = -1
 
         self.boardSize = boardSize
@@ -53,6 +34,7 @@ class Simulation:
         self.obstacleMaxSize = 51
         self.obstacleList = []
         self.createObstacles()
+        self.penaltyBoard = self.createPenaltyBoard()
 
     def createObstacles(self):
 
@@ -108,10 +90,6 @@ class Simulation:
         return board
 
     def addObstaclesPenalty(self,board):
-
-        #for obstacle in self.obstacleList:
-
-         #   obstacle.putSubPenaltyOnBoard(board)
 
         for obstacle in self.obstacleList:
 
