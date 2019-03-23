@@ -92,3 +92,58 @@ def train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTresh
     print("Time to run in second : " + str(end - start))
 
     return lossList
+
+
+def generateTrainingData(model, nbUpdate, startRandTresh):
+
+    randMoveTreshold = startRandTresh
+    model.eval()
+
+    engine = Engine(1, (15, 15), (15, 15), 224)
+    trainSeq = []
+
+    for i in range(nbUpdate):
+
+        boards = engine.drawAllBoard()
+        move = np.random.randint(0, high=8)
+
+        if (randMoveTreshold < np.random.random()):
+            with torch.no_grad():
+                torchBoards = torch.FloatTensor(boards).cuda()
+                torchBoards = torch.unsqueeze(torchBoards, 1)
+                allPred = model(torchBoards)
+                target = allPred.data.cpu().numpy()
+                allMove = np.argmax(target, axis=1)
+                move = allMove[0]
+
+        engine.update([move])
+        newRobotPos = engine.getAllRobotPos()
+        penalty = engine.calculateObstaclePenalty(newRobotPos)
+        finalReward = engine.calculateFinalReward(newRobotPos)
+
+        if (penalty > 0):
+            trainSeq += [(boards[0], move, -1)]
+            break
+
+        if (finalReward > 0):
+
+            reward = 1
+            rewardTrainSeq = [(boards[0], move, reward)]
+
+            for j in range(i-1,-1,-1):
+
+                board, oldMove, _ = trainSeq[j]
+                reward = reward * 0.9
+                rewardTrainSeq += [(board, oldMove, reward)]
+
+            trainSeq = rewardTrainSeq
+            break
+
+        trainSeq += [(boards[0], move, 0)]
+
+    return trainSeq
+
+
+
+
+
