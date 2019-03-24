@@ -45,17 +45,16 @@ class PathFinder(nn.Module):
 
         super(PathFinder, self).__init__()
 
-        self.flatShape = 1*1*512
+        self.flatShape = 1*1*64
 
-        self.conv1 = nn.Conv2d(1, 64, 7, padding=4, stride=2)
+        self.conv1 = nn.Conv2d(1, 8, 7, padding=4, stride=2)
         self.max1 = nn.MaxPool2d(2, 2)
-        self.res1 = ResidualModuleDouble(64, 128)
+        self.res1 = ResidualModuleDouble(8, 16)
         self.max2 = nn.MaxPool2d(2, 2)
-        self.res2 = ResidualModuleDouble(128, 256)
+        self.res2 = ResidualModuleDouble(16, 32)
         self.max3 = nn.MaxPool2d(2, 2)
-        self.res3 = ResidualModuleDouble(256, 512)
+        self.res3 = ResidualModuleDouble(32, 64)
         self.max4 = nn.MaxPool2d(2, 2)
-        self.res4 = ResidualModuleSingle(512)
         self.avg1 = nn.AvgPool2d(7, 7)
         self.lin1 = nn.Linear(self.flatShape, 8)
 
@@ -69,7 +68,6 @@ class PathFinder(nn.Module):
         h = self.max3(h)
         h = self.res3(h)
         h = self.max4(h)
-        h = self.res4(h)
         h = self.avg1(h)
         h = h.view(-1, self.flatShape)
         h = self.lin1(h)

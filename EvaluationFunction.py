@@ -1,22 +1,7 @@
 import torch
 import numpy as np
 from SimWorld.Engine import Engine
-import matplotlib.pyplot as plt
-
-def showImgs(imgs, nbEx, nbCl):
-    counter = 0
-    for i in range(nbCl):
-        for j in range(nbEx):
-            plt.subplot(nbEx, nbCl, counter+1)
-            plt.imshow(imgs[counter].astype('uint8'))
-            plt.axis('off')
-            counter += 1
-
-    plt.show()
-
-def adjustBoardFromSim(board):
-
-    return (board + 1.0) * 127.5
+from Utils import showImgs, adjustBoardFromSim
 
 def evaluateModel(model):
 

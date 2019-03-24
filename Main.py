@@ -1,32 +1,55 @@
-import torch
 from PytorchNetwork import PathFinder
 from TrainingFunction import train, generateTrainingData
-from EvaluationFunction import evaluateModel, showImgs, adjustBoardFromSim
-
-saveIt = -1
-savePath = "../SavedModel/pathFinderModel"
+from EvaluationFunction import evaluateModel
+from Utils import plotGraph, balanceDataset, sepInPosNegAndRemoveZero
 
 model = PathFinder().cuda()
 
-nbUpdate = 25
-batchSize = 50
-lr = 1e-4
-startRandTresh = 0.5 # start at 1 to have complete random choice in beginning
+nbGenSeq = 500
+maxNbUpdate = 25
+randTresh = 1 # start at 1 to have complete random choice in beginning
+forget = 0.95
 
+nbIteration = 15
+batchSize = 60
+lr = 5e-4
 
-for i in range(25):
+posDataset = []
+negDataset = []
 
-    trainSeq = generateTrainingData(model, nbUpdate, startRandTresh)
+for k in range(5):
 
-    boards = []
-    rewards = []
+    print("Doing : " + str(k+1) + "/" + str(5))
 
-    for board, move, reward in trainSeq:
-        boards += [adjustBoardFromSim(board)]
-        rewards += [reward]
+    print("Generating Data")
+    print("randTresh : " + str(randTresh))
+    trainData = []
+    for i in range(nbGenSeq):
+        trainData += generateTrainingData(model, maxNbUpdate, randTresh, forget)
 
-    print(rewards)
-    #showImgs(boards, 1, len(boards))
+    posData, negData = sepInPosNegAndRemoveZero(trainData)
+    posDataset += posData
+    negDataset += negData
 
+    print("nb Pos Data : " + str(len(posData)))
+    print("nb Neg Data : " + str(len(negData)))
 
-#evaluateModel(model)
+    print("Total nb Pos Data : " + str(len(posDataset)))
+    print("Total nb Neg Data : " + str(len(negDataset)))
+
+    balDataset = balanceDataset(posDataset, negDataset)
+    randTresh = randTresh * 0.6
+
+    print("Starting trainning!")
+    lossList = train(model, balDataset, nbIteration, batchSize, lr)
+
+    title = "Loss by iteration"
+    labels = ["train loss"]
+    ax1Name = "Iteration"
+    ax2Name = "Loss"
+
+    plotGraph(title, [list(range(len(lossList)))], [lossList], labels, ax1Name, ax2Name)
+
+    evaluateModel(model)
+
+    print("-------------------------------------------------------------------------")

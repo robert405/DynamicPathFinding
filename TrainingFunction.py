@@ -3,102 +3,66 @@ import torch.nn as nn
 import numpy as np
 import time
 from SimWorld.Engine import Engine
+from random import shuffle
 
-def train(model, nbIteration, nbUpdate, batchSize, lr, startRandTresh, randTreshRate):
+def train(model, data, nbIteration, batchSize, lr):
 
-    print("Starting trainning!")
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
-    randMoveTreshold = startRandTresh
     lossList = []
-    moduloPrint = 50
     model.train()
     start = time.time()
 
     for k in range(nbIteration):
 
+        shuffle(data)
+        count = 0
         meanLoss = 0
-        engine = Engine(batchSize,(15,15),(15,15),224)
-        trainSeq = []
-        newRobotPos = np.empty(batchSize)
 
-        for i in range(nbUpdate):
+        for i in range(0,len(data),batchSize):
 
-            boards = engine.drawAllBoard()
-            oldRobotPos = engine.getAllRobotPos()
-            allMove = np.random.rand(batchSize) * 8
-            allMove = np.floor(allMove).astype('int')
+            batch = data[i:i+batchSize]
+            boards = []
+            moves = []
+            rewards = []
 
-            if (randMoveTreshold < np.random.random()):
-                with torch.no_grad():
-                    torchBoards = torch.FloatTensor(boards).cuda()
-                    torchBoards = torch.unsqueeze(torchBoards, 1)
-                    allPred = model(torchBoards)
-                    target = allPred.data.cpu().numpy()
-                    allMove = np.argmax(target, axis=1)
+            for board, move, reward in batch:
 
-            engine.update(allMove)
-            newRobotPos = engine.getAllRobotPos()
-            stepReward = engine.calculateStepReward(oldRobotPos, newRobotPos)
+                boards += [board]
+                moves += [move]
+                rewards += [reward]
 
-            trainSeq += [(boards, allMove, stepReward)]
+            boards = torch.FloatTensor(boards).cuda()
+            boards = torch.unsqueeze(boards, 1)
+            index = torch.arange(len(moves)).cuda()
+            moves = torch.LongTensor(moves).cuda()
+            rewards = torch.FloatTensor(rewards).cuda()
 
-        finalReward = engine.calculateFinalReward(newRobotPos)
-        currentReward = finalReward
+            allPred = model(boards)
+            allPred = allPred[index,moves]
 
-        for i in range((nbUpdate-1),-1,-1):
-
-            boards, allMove, reward = trainSeq[i]
-            torchBoards = torch.FloatTensor(boards).cuda()
-            torchBoards = torch.unsqueeze(torchBoards, 1)
-            allPred = model(torchBoards)
-            reward = reward + currentReward
-            reward = np.maximum(reward, -1)
-            currentReward = 0.9 * currentReward
-            rowIndexing = np.arange(batchSize)
-            target = allPred.data.cpu().numpy()
-            target[rowIndexing, allMove] = reward
-            torchTarget = torch.FloatTensor(target).cuda()
-
-            loss = criterion(allPred, torchTarget)
+            loss = criterion(allPred, rewards)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
             currentLoss = loss.data.cpu().numpy()
             meanLoss += currentLoss
+            count += 1
 
-        meanLoss = meanLoss / nbUpdate
+        meanLoss = meanLoss / count
         lossList += [meanLoss]
 
-        if (k % moduloPrint == 0):
-            print("Iteration : " + str(k+1) + " / " + str(nbIteration) + ", Current mean loss : " + str(meanLoss))
-
-        if ((k+1) % randTreshRate == 0 and randMoveTreshold > 0):
-            randMoveTreshold += -0.05
-
-        if (k % 200 == 0):
-            end = time.time()
-            timeTillNow = end - start
-            predictedRemainingTime = (timeTillNow / (k + 1)) * (nbIteration - (k + 1))
-            print("--------------------------------------------------------------------")
-            print("Time to run since started (sec) : " + str(timeTillNow))
-            print("Predicted remaining time (sec) : " + str(predictedRemainingTime))
-            print("--------------------------------------------------------------------")
-
-
     end = time.time()
-    print("Time to run in second : " + str(end - start))
+    print("Training time in second : " + str(end - start))
 
     return lossList
 
 
-def generateTrainingData(model, nbUpdate, startRandTresh):
+def generateTrainingData(model, nbUpdate, randTresh, forget):
 
-    randMoveTreshold = startRandTresh
     model.eval()
-
     engine = Engine(1, (15, 15), (15, 15), 224)
     trainSeq = []
 
@@ -107,14 +71,14 @@ def generateTrainingData(model, nbUpdate, startRandTresh):
         boards = engine.drawAllBoard()
         move = np.random.randint(0, high=8)
 
-        if (randMoveTreshold < np.random.random()):
-            with torch.no_grad():
-                torchBoards = torch.FloatTensor(boards).cuda()
-                torchBoards = torch.unsqueeze(torchBoards, 1)
-                allPred = model(torchBoards)
-                target = allPred.data.cpu().numpy()
-                allMove = np.argmax(target, axis=1)
-                move = allMove[0]
+        if (randTresh < np.random.random()):
+
+            torchBoards = torch.FloatTensor(boards).cuda()
+            torchBoards = torch.unsqueeze(torchBoards, 1)
+            allPred = model(torchBoards)
+            target = allPred.data.cpu().numpy()
+            allMove = np.argmax(target, axis=1)
+            move = allMove[0]
 
         engine.update([move])
         newRobotPos = engine.getAllRobotPos()
@@ -133,7 +97,7 @@ def generateTrainingData(model, nbUpdate, startRandTresh):
             for j in range(i-1,-1,-1):
 
                 board, oldMove, _ = trainSeq[j]
-                reward = reward * 0.9
+                reward = reward * forget
                 rewardTrainSeq += [(board, oldMove, reward)]
 
             trainSeq = rewardTrainSeq
